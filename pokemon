@@ -1,0 +1,796 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h> 
+
+#define Lin 20
+#define Col 30
+#define mSize 4
+
+
+typedef struct tipoMonstro{
+	int id;
+	char nome[15];
+	float vida;
+	float peso;
+	float altura;
+} tipoMonstro;
+
+typedef struct mochila
+{
+	tipoMonstro pokes[mSize];	
+} mochila;
+
+struct monstroInimigo{
+	int x;
+	int y;
+	struct tipoMonstro;
+};
+
+struct Jogador{
+	int x;
+	int y;
+};
+int batalha(mochila *m, tipoMonstro *t);
+struct Jogador j1;
+struct monstroInimigo m1, m2, m3;
+char mapa[Lin][Col];
+char mapa2[Lin][Col];
+void inicializa_Mapa_muros2 (char mapa[Lin][Col]){
+	int i, lado, nvida, x,y,j;
+	srand(time(NULL)); 
+	
+	for	(i = 0; i < Lin; i++){
+		for (j = 0; j < Col; j++){
+			mapa[i][j] = ' ';			
+		}
+	}    
+	
+	for (i = 0; i < Col; i++) {
+        mapa[0][i] = '/';
+        mapa[Lin-1][i] = '/';
+    }
+    for (i = 0; i < Lin; i++){
+        mapa[i][0] = '/';
+        mapa[i][Col-1] = '/';
+        
+	}
+	for (i = 4; i < 6; i++)
+		for (j = 1; j < 10; j++)
+		mapa[i][j] = '#';
+
+	for (i = 6; i < 8; i++){
+		for (j = 8; j < 12; j++)
+			mapa[i][j] = '#';
+	}
+	
+	for (i = 13; i < 15; i++)
+		for (j = 5; j < 17; j++)
+			mapa[i][j] = '#';
+	for (i = 1; i < 8; i++)
+		for (j = 13; j < 16; j++)
+			mapa[i][j] = '#';
+			
+	for (i = 1; i < 14; i++)
+		for (j = 22; j < 26; j++)
+			mapa[i][j] = '#';	
+			
+	//Seleção de onde o jogador vai inicializar
+	for(x=Lin-1;x>0;x--){
+		for(y=Col-1;y>0;y--){
+			if(mapa[x][y] == ' '){
+				j1.x = x;
+				j1.y = y;
+			}
+		}
+	}
+	
+	
+	//Evita que o monstro sobreponha a identificação do jogador
+	do{
+    m1.x = rand() % (Lin-2) + 1;
+    m1.y = rand() % (Col-2) + 1;
+    m2.x = rand() % (Lin-2) + 1;
+    m2.y = rand() % (Col-2) + 1;
+    m3.x = rand() % (Lin-2) + 1;
+    m3.y = rand() % (Col-2) + 1;
+	}while((m1.x == j1.x && m1.y == j1.x) || (m2.x == j1.x && m2.y == j1.x) || (m3.x == j1.x && m3.y == j1.x) || (m1.x == Lin-j1.x && m1.y == Col-j1.y) || (m2.x == Lin-j1.x && m2.y == Col-j1.y) || (m3.x == Lin-j1.x && m3.y == Col-j1.y) || mapa[m1.x][m1.y] == '/' || mapa[m2.x][m2.y] == '/' || mapa[m3.x][m3.y] == '/');
+    
+    nvida = rand() % 8 + 2;
+    for(i=1; i<=nvida; i++){
+    do{
+   		x = rand() % (Lin-2) + 1;
+    	y = rand() % (Col-2) + 1;
+	}while((x == m1.x && y == m1.y) || (x == m2.x && y == m2.y) || (x == m3.x && y == m3.y) || (x == j1.x && y == j1.y) || (x == Lin-j1.x && y == Col-j1.y ) || mapa[m1.x][m1.y] == '/' || mapa[m2.x][m2.y] == '/' || mapa[m3.x][m3.y] == '/');
+		mapa[x][y]='x';
+	}
+    
+    mapa[m1.x][m1.y]='?';
+	mapa[m2.x][m2.y]='?';
+	mapa[m3.x][m3.y]='?';
+	
+	mapa[j1.x][j1.y]='8';
+	mapa[(Lin-1)-j1.x][(Col-1)-j1.y]='=';
+}
+
+void inicializa_Mapa (char mapa[Lin][Col]){
+	int i, lado, nvida, x,y,j;
+	srand(time(NULL)); 
+	
+	for	(i = 0; i < Lin; i++){
+		for (j = 0; j < Col; j++){
+			mapa[i][j] = ' ';			
+		}
+	}    
+	
+	for (i = 0; i < Col; i++) {
+        mapa[0][i] = '/';
+        mapa[Lin-1][i] = '/';
+    }
+    for (i = 0; i < Lin; i++){
+        mapa[i][0] = '/';
+        mapa[i][Col-1] = '/';
+        
+	}
+			
+	//Seleção de onde o jogador vai inicializar
+	for(x=Lin-1;x>0;x--){
+		for(y=Col-1;y>0;y--){
+			if(mapa[x][y] == ' '){
+				j1.x = x;
+				j1.y = y;
+			}
+		}
+	}
+	
+	
+	//Evita que o monstro sobreponha a identificação do jogador
+	do{
+    m1.x = rand() % (Lin-2) + 1;
+    m1.y = rand() % (Col-2) + 1;
+    m2.x = rand() % (Lin-2) + 1;
+    m2.y = rand() % (Col-2) + 1;
+    m3.x = rand() % (Lin-2) + 1;
+    m3.y = rand() % (Col-2) + 1;
+	}while((m1.x == j1.x && m1.y == j1.x) || (m2.x == j1.x && m2.y == j1.x) || (m3.x == j1.x && m3.y == j1.x) || (m1.x == Lin-j1.x && m1.y == Col-j1.y) || (m2.x == Lin-j1.x && m2.y == Col-j1.y) || (m3.x == Lin-j1.x && m3.y == Col-j1.y) || mapa[m1.x][m1.y] == '/' || mapa[m2.x][m2.y] == '/' || mapa[m3.x][m3.y] == '/');
+    
+    nvida = rand() % 8 + 2;
+    for(i=1; i<=nvida; i++){
+    do{
+   		x = rand() % (Lin-2) + 1;
+    	y = rand() % (Col-2) + 1;
+	}while((x == m1.x && y == m1.y) || (x == m2.x && y == m2.y) || (x == m3.x && y == m3.y) || (x == j1.x && y == j1.y) || (x == Lin-j1.x && y == Col-j1.y ) || mapa[m1.x][m1.y] == '/' || mapa[m2.x][m2.y] == '/' || mapa[m3.x][m3.y] == '/');
+		mapa[x][y]='x';
+	}
+    
+    mapa[m1.x][m1.y]='?';
+	mapa[m2.x][m2.y]='?';
+	mapa[m3.x][m3.y]='?';
+	
+	mapa[j1.x][j1.y]='8';
+	mapa[(Lin-1)-j1.x][(Col-1)-j1.y]='=';
+}
+
+void imprime_Mapa (char mapa[Lin][Col]) {
+	int i, j;
+    for (i = 0; i < Lin; i++){
+        for (j = 0; j < Col; j++)
+            printf("%c", mapa[i][j]);
+        printf("\n");
+    }     
+    printf("\n");
+}
+
+
+int frente_desce(char lab[Lin][Col], int l, int c, struct mochila m, struct tipoMonstro m1, struct tipoMonstro m2, struct tipoMonstro m3) {
+	srand(time(NULL));
+	int fim = 0;
+	if(lab[l][c] == '=') //ACHOU SAÍDA, SAI DO JOGO!
+  		return 1;
+	while (fim == 0) {
+		
+		while (((lab[l][c] != '/') && (lab[l][c] != '#') )) { //Andando em linha reta >>>>
+			lab[l][c] = '.';
+			imprime_Mapa(mapa2);
+			sleep(1);
+			c++;
+			int monstro = rand () % 3;
+			if (lab[l][c] == '=')
+			 	fim = 1;
+		   	if(lab[l][c] == '?'){
+		   		if (monstro == 1){  
+					batalha(&m, &m1); 
+					sleep(3);
+			}	else if (monstro == 2) {
+					batalha(&m, &m2);
+					sleep(3);
+			}	else if (monstro == 3) {
+					batalha(&m, &m3);
+					sleep(3);
+			}					 	
+		}
+		}
+
+		if ((lab[l][c] == '/') || (lab[l][c] == '#')) {
+			c--;
+			l++;			
+		}
+				
+  		while (((lab[l][c] != '/') && (lab[l][c] != '#'))) { //Andando para baixo \/ \/ \/ \/
+   			lab[l][c] = '.';
+   			imprime_Mapa(mapa2);
+			sleep(1);
+			l++;
+			int monstro = rand () % 3;
+		   	if(lab[l][c] == '?'){
+		   		if (monstro == 1){  
+					batalha(&m, &m1); 
+					sleep(3);
+			}	else if (monstro == 2) {
+					batalha(&m, &m2);
+					sleep(3);
+			}	else if (monstro == 3) {
+					batalha(&m, &m3);
+					sleep(3);
+			}		
+		}
+			
+			if (lab[l][c] == '=')
+			 	fim = 1;
+		}
+
+		if ((lab[l][c] == '/') || (lab[l][c] == '#')) {
+				c++;
+				l--;
+		}
+		
+			if (fim)
+				printf("Jogador achou a saida!!! \n \n \n");
+	}
+}
+
+int sai(char lab[Lin][Col], int l, int c, struct mochila m, struct tipoMonstro m1, struct tipoMonstro m2, struct tipoMonstro m3) {
+  	
+	srand(time(NULL));  
+	int cam = rand() % 24;
+	if(lab[l][c] == '=')
+   		return 1;
+   	
+   	if(lab[l][c] == '?'){
+		batalha(&m, &m1); //exemplo de batalha
+		batalha(&m, &m2);
+		batalha(&m, &m3);
+	}
+//   	if(lab[l][c] == 'x')
+		//item();
+	
+	
+	lab[l][c] = '.';
+	sleep(1);
+	
+	imprime_Mapa(mapa);
+	
+	switch (cam){
+	case 0:
+	//1234
+	if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+ 	if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+  	if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+  	if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;
+  	
+	case 1:
+	//1243
+	if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+ 	if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+  	if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+	if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;
+	
+  	case 2:
+	//1324
+	if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+ 	if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+	if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;
+	  
+	case 3:
+	//1342
+	if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+ 	if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;  		
+	if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;
+	
+	case 4:
+	//1423
+	if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+	if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+  	return 0; 	
+	break;
+	
+	case 5:
+	//1432
+	if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+	if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+  	return 0;  	
+	break; 
+	
+	case 6:
+	//2134
+	if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;		
+    if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+  	return 0;  	
+	break; 
+	
+	case 7:
+	//2143
+	if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+	if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;		
+    if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+  	return 0;  	
+	break; 	
+	
+	case 8:
+	//2314
+	if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+	if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+  	return 0; 	
+	break;	
+	
+	case 9:
+	//2341
+	if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+	if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;
+	
+	case 10:
+	//2413
+	if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+	if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;	
+	
+	case 11:
+	//2431
+	if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+	if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;	
+	
+	case 12:
+	//3124
+	if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;	
+	
+	case 13:
+	//3142
+	if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;	
+	
+	case 14:
+	//3214
+	if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+	if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;	
+	
+	case 15:
+	//3241
+	if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+	if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;
+	
+	case 16:
+	//3412
+	if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+	if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;
+	
+	case 17:
+	//3421
+	if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+	if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;
+	
+	case 18:
+	//4123
+	if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;	
+
+	
+	case 19:
+	//4132
+	if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;	
+
+  		
+	case 20:
+	//4213
+	if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+	if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;	
+
+	
+	case 21:
+	//4231
+	if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+	if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;	
+	
+	
+	case 22:
+	//4312
+	if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+	if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;	
+	
+	
+	case 23:
+	//4321
+	if(lab[l][c-1] == ' ' || lab[l][c-1] == '=' || lab[l][c-1] == 'x' || lab[l][c-1] == '?')
+    	if(sai(lab, l, c-1, m, m1, m2, m3))
+      		return 1;
+	if(lab[l-1][c] == ' ' || lab[l-1][c] == '=' || lab[l-1][c] == 'x' || lab[l-1][c] == '?')
+    	if(sai(lab, l-1, c, m, m1, m2, m3))
+      		return 1;
+    if(lab[l][c+1] == ' ' || lab[l][c+1] == '=' || lab[l][c+1] == 'x' || lab[l][c+1] == '?')
+    	if(sai(lab, l, c+1, m, m1, m2, m3))
+      		return 1;
+    if(lab[l+1][c] == ' ' || lab[l+1][c] == '=' || lab[l+1][c] == 'x' || lab[l+1][c] == '?')
+    	if(sai(lab, l+1, c, m, m1, m2, m3))
+      		return 1;
+  	return 0;
+	break;	
+	}
+	
+}
+
+void carregaMonstros(mochila *m, tipoMonstro *m1, tipoMonstro *m2, tipoMonstro *m3) {
+	m->pokes[0].id = 1;
+	strcpy(m->pokes[0].nome, "bulbasaur");
+	m->pokes[0].vida = 66.0;
+	m->pokes[0].peso = 9.56;
+	m->pokes[0].altura = 0.79;
+
+	m->pokes[1].id = 2;
+	strcpy(m->pokes[1].nome, "charmander");
+	m->pokes[1].vida = 54.0;
+	m->pokes[1].peso = 4.94;
+	m->pokes[1].altura = 0.45;
+
+	m->pokes[2].id = 3;
+	strcpy(m->pokes[2].nome, "squirtle");
+	m->pokes[2].vida = 38.0;
+	m->pokes[2].peso = 7.04;
+	m->pokes[2].altura = 0.45;
+
+	m->pokes[3].id = 4;
+	strcpy(m->pokes[3].nome, "pikachu");
+	m->pokes[3].vida = 50.0;
+	m->pokes[3].peso = 7.6;
+	m->pokes[3].altura = 0.44;
+
+	m1->id = 4;
+	strcpy(m1->nome, "pikachu");
+	m1->vida = 50.0;
+	m1->peso = 7.6;
+	m1->altura = 0.44;
+
+	m2->id = 2;
+	strcpy(m2->nome, "charmander");
+	m2->vida = 54.0;
+	m2->peso = 4.94;
+	m2->altura = 0.45;
+
+	m3->id = 3;
+	strcpy(m3->nome, "squirtle");
+	m3->vida = 38.0;
+	m3->peso = 7.04;
+	m3->altura = 0.45;
+}	
+
+int batalha(mochila *m, tipoMonstro *t) {//retorna 1 para vitoria e -1 para derrota
+	int f = 0;
+	for (int i = 0; i < mSize; ++i) {
+		if (m->pokes[i].vida > 0.0) f += 1;
+	}
+	if (!f) return -1;//não tem nenhum pokemon disponivel para lutar
+    srand((unsigned)time(NULL));
+    int p = 0;
+	if (t->vida <= 0.0) return 1;//vitoria
+	for(;;) {
+		p = rand()%mSize;
+		if (m->pokes[p].vida > 0.0) {
+			printf("%-15s: %2.2f\t\t%-15s: %2.2f\n", m->pokes[p].nome,m->pokes[p].vida,t->nome,t->vida);
+			for(;;) {
+				if ((float)(rand() % 100 + 1) <= (t->vida/10.0)) {
+					m->pokes[p].vida -= (t->peso)/(t->altura);
+					if (m->pokes[p].vida <= 0.0) m->pokes[p].vida = 0.0;
+					printf("%-15s: %2.2f\t\t%-15s: %2.2f\n", m->pokes[p].nome,m->pokes[p].vida,t->nome,t->vida);
+				}
+				if (m->pokes[p].vida > 0.0) {
+					if ((float)(rand() % 100 + 1) <= (m->pokes[p].vida/10.0)) {
+						t->vida -= (m->pokes[p].peso)/(m->pokes[p].altura);
+						if (t->vida <= 0.0) t->vida = 0.0;
+						printf("%-15s: %2.2f\t\t%-15s: %2.2f\n", m->pokes[p].nome,m->pokes[p].vida,t->nome,t->vida);
+					}
+					if (t->vida <= 0.0) {
+						printf("## %s inimigo derrotado!\n", t->nome);
+						return 1;//vitoria
+					}
+				} else {
+					f--;//pokemon desmaiou
+					printf("## %s desmaiou\n", m->pokes[p].nome);
+					break;
+				}
+			}
+		}
+		if (!f) {
+			printf("## Todos pokemons estao desmaiados\n");
+			return -1;//derrota
+		}
+	}
+}	
+
+int main (){
+	mochila m;
+	tipoMonstro m1, m2, m3;
+	carregaMonstros(&m, &m1, &m2, &m3);
+	int tipoJogo;
+	printf("Selecione modo de jogo: \n 1) Mapa com muros - Jogador anda em linha reta ate encontrar parede. \n 2) Mapa sem muros, jogador busca saida aleatoriamente. \nOpcao: ");
+	scanf("%i", &tipoJogo);
+	if (tipoJogo == 1) {
+			inicializa_Mapa_muros2(mapa2);
+			imprime_Mapa(mapa2);
+			frente_desce(mapa2, j1.x, j1.y, m, m1, m2, m3);
+		} else if (tipoJogo == 2) {
+			inicializa_Mapa(mapa);
+    		imprime_Mapa(mapa);
+    		sai(mapa, j1.x, j1.y, m, m1, m2, m3);
+	}
+
+return 0;
+}
