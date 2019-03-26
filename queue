@@ -1,0 +1,157 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "queue.h"
+
+
+// verifica se fila existe
+int not_queue (queue_t **queue) {
+	if (!queue)
+		return 1;
+	return 0;
+}
+
+// verifica se a fila existe e esta vazia
+int empty (queue_t **queue) {
+    if (*queue == NULL){ 
+		return 2;	
+	} return 0;
+}
+
+int not_elem (queue_t *elem) {
+	if (elem == NULL) 
+		return 3;
+	return 0;
+}
+	
+// insere um elemento no final da fila
+void queue_append (queue_t **queue, queue_t *elem){
+    queue_t *aux;
+    int auxiliar = 0;
+    //verifica se a fila esta vazia
+	auxiliar = (empty(queue));
+    // se vazia, insere como primeiro elemento
+    // faz a fila apontar para si mesma
+	if (auxiliar == 2) {
+        (*queue) = elem;
+        (*queue)->prev = elem;
+        (*queue)->next = elem;
+        return;
+    }
+    // verifica se existe fila
+    auxiliar = (not_queue(queue));
+     	if (auxiliar == 1){
+		   	fprintf(stderr, "The queue doesn't exist.\n");
+		   	return;
+    	}
+	    // verifica se o elemento pertence a outra fila
+    if (elem->next != NULL || elem->prev != NULL){
+        fprintf(stderr, "The element already exist in another queue.\n");
+        return;
+    }
+    // insere no proximo elemento de fila e faz a fila apontar para si mesma
+    aux = (*queue)->prev;
+    (*queue)->prev = elem;
+    aux->next = elem;
+    elem->prev=aux;
+    elem->next = (*queue);
+
+}
+
+queue_t *queue_remove (queue_t **queue, queue_t *elem){
+    queue_t *aux, *aux1;
+    aux = (*queue) -> next;
+    int auxiliar = 0;
+    // testa se existe fila
+    auxiliar = (not_queue(queue));
+    if (auxiliar == 1){
+	 	fprintf(stderr, "The queue doesn't exist.\n");
+	   	return NULL;
+    }
+    // testa se existe elemento na fila
+	auxiliar = (empty(queue));
+    if (auxiliar == 2){
+        fprintf(stderr, "The queue is empty.\n");
+        return NULL;
+    }
+    // testa se o elemento existe
+    auxiliar = (not_elem(elem));
+    if (auxiliar == 3){
+        fprintf(stderr, "The element doesn't exist.\n");
+        return NULL;
+    } 
+    // se o elemento eh o unico da fila e a cabeca
+    if((*queue == (*queue)->next) && (*queue == elem)){
+    	*queue = NULL;
+        elem->next = NULL;
+        elem->prev = NULL;
+        return elem;
+    }
+    // se o elemento eh a cabeca da fila mas existem mais elementos
+    if (*queue == elem) {
+    	(*queue)->next->prev = (*queue)->prev;
+    	(*queue)->prev->next = (*queue)->next;
+    	*queue = aux;
+    	elem->prev = NULL;
+    	elem->next = NULL;
+    	return elem;
+    } 
+   	// se o elemento nao eh a cabeca da fila
+ 
+    aux1 = *queue;
+    *queue = (*queue)->next;
+ 
+    while(*queue != aux1) {
+    	if (*queue == elem){
+    		(*queue)->next->prev = (*queue)->prev;
+    		(*queue)->prev->next = (*queue)->next;
+    		*queue = aux1;
+    		elem->next = NULL;
+    		elem->prev = NULL;
+    		return elem;
+    	}
+    	*queue = (*queue)->next;
+    } 
+    return NULL;
+}
+
+
+int queue_size (queue_t *queue){
+    
+    int cont = 1;
+
+    // verifica se a fila existe
+    if(queue == NULL){
+         return 0;
+    }
+    queue_t *aux; 
+	aux = queue;
+	queue_t *percorre; 
+	percorre = queue->next;
+	while (percorre != aux){
+		cont++;
+		percorre = percorre->next;
+
+	}
+			return cont;
+}	
+
+void queue_print (char *name, queue_t *queue, void print_elem (void*)){
+	int contador, i;
+	i = 0;
+	contador = queue_size(queue);
+	// verifica se a fila existe
+	if(contador == 0){
+        fprintf(stderr, " ");
+    }
+    // verifica se a fila esta vazia, se nao estiver retorna contador
+    printf("%s ", name);
+	printf(":[");
+	while( i < contador){
+		print_elem(queue);
+    	queue = queue->next;	
+    	i++;
+    	printf(" ");	
+	}
+	printf("]");
+	printf("\n\n\n");    
+}
