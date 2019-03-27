@@ -1,0 +1,52 @@
+#include "lcrandom.c"
+#define TAM 1000000
+
+int main (){
+    
+    unsigned long random[TAM];
+    unsigned long repeticao[100];
+    unsigned long maior=0;
+    int i, j;
+    
+    lcrandom_parms(1103515245, 12345, 2147483648);
+    
+    for (i = 0; i < 100; i++){
+        repeticao[i] = 0;
+    }
+    
+    for (i = 0; i < TAM; i++){
+        random[i] = lcrandom() % 100;
+        repeticao[random[i]] ++;
+    }
+    
+    /*
+    // Exibe numeros gerados
+    for (i = 0; i < 300; i++){
+        printf ("random[%d] = %ld\n ", i, random[i]);
+    }
+    */
+    
+    for (i = 0; i < 100; i++){
+        if (repeticao[i] > maior){
+            maior = repeticao[i];
+        }
+    }
+    
+    for (i = 0; i < 100; i++){
+        //printf ("repeticao[%d] = %ld  |  ", i, repeticao[i]);
+        repeticao[i] = (repeticao[i]*100/maior);
+        //printf ("repeticao[%d] = %ld\n", i, repeticao[i]);
+    }
+    
+    printf ("   0   10   20   30   40   50   60   70   80   90   100\n"
+            "   +----+----+----+----+----+----+----+----+----+----+");
+    for (i = 0; i < 100; i++){
+        printf ("\n%2.d |", i);
+        //getchar();
+        for (j = 0; j < (repeticao[i]/2); j++){
+            printf("*");
+        }
+    }
+    printf("\n   +----+----+----+----+----+----+----+----+----+----+\n");
+    return 0;
+} 
