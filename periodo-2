@@ -1,0 +1,64 @@
+include "lcrandom.c"
+
+unsigned long periodo ();
+unsigned long periodo_malloc ();
+
+int main (void){
+    lcrandom_parms(1103515245, 12345, 2147483648);
+    printf ("\nAguarde... Isto pode demorar!\n\n");
+    printf ("\nPeriodo = %ld\n\n", periodo_malloc());
+    return 0;
+}
+
+unsigned long periodo (){
+    unsigned long contador = 0, random_memoria = 0, random;
+    int flag = 1, i;
+    do{
+        lcrandom_seed(random_memoria);
+        random_memoria = lcrandom();
+        random_memoria = lcrandom();
+        
+        
+        lcrandom_seed(0); //x0 = 0
+        for (i = 0; i < contador; i ++){
+            random = lcrandom();
+            if (random == random_memoria){
+                flag = 0;
+            }
+        }
+        contador ++;
+    } while(flag);
+    
+    return --contador;
+}
+
+unsigned long periodo_malloc(){
+    unsigned long periodo = 0;
+    unsigned int *repeticao;
+    unsigned long cont = 0;
+    unsigned long random;
+    int i;
+    
+    lcrandom_seed(0); //x0 = 0
+    repeticao = (unsigned int*) malloc (lcrandom_max() * sizeof(unsigned int));
+    if (repeticao == NULL) {
+        printf ("Erro! malloc devolveu NULL!\n");
+        exit (EXIT_FAILURE);
+    }
+   
+    for (i = 0; i < lcrandom_max(); i++){
+        repeticao[i] = 0;
+    }
+    
+    do{
+        random = lcrandom();
+        repeticao[random] ++;
+        if (repeticao[random] > 1){
+            periodo = cont;
+        }
+        cont ++;
+    }while (periodo == 0);
+    
+    free(repeticao);
+    return --periodo;
+}
