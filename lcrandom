@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "lcrandom.h"
+unsigned long a=40692 ;     //parametros globais default - inicio
+unsigned long c = 127 ;
+unsigned long m=10000000 ;
+unsigned long seed=0 ;     // - fim
+
+unsigned long lcrandom () { //funcao que retorna um numero aleatorio
+    unsigned long x;    
+	//int	i;
+	//i=rand(10); 
+	//aux=seed;  //aux esta recebendo o primeiro numero (seed)
+	//for (int i=0;i<=j;i++){
+    //    x=(a*aux+c) % m ;   //formula para gera o numero aleatorio
+	//	aux=x ;
+	//}            
+    x = seed;
+    seed = (a*seed+c) % m ;   //formula para gera o numero aleatorio
+	return(x);           //retorna o numero aleatorio 
+	
+}
+
+
+void lcrandom_seed (unsigned long s) { //funcao que altera o primeiro numero default (seed)
+	seed=s ;
+	
+} 
+
+
+unsigned long lcrandom_max () {
+    return (m-1); //Como o numero e gerado pelo resto da divisao por 'm', neste caso sempre o resto sera um numero menor que a variavel 'm'.
+}
+
+
+void lcrandom_parms (unsigned long A, unsigned long C, unsigned long M) { //funcao que atera os paramentros default da formula
+	a=A ;
+	c=C ; 
+	m=M ;
+}
